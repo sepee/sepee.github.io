@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 <!DOCTYPE html>
 <html lang="en-us">
   <head>
@@ -117,3 +118,152 @@
     </script>
   </body>
 </html>
+=======
+<head>
+	<title>
+		Complex Function Plotter
+	</title>
+</head>
+<body style="display: flex; align-items: center;">
+	<div style="align-self: center; max-width: 800; margin: auto;">
+		<h1>Complex Plotter</h1>
+		f(z) = <input type="text" name="f(z)" id ="function-input">
+    <button type="button" name="submit-function" onclick="reloadFunction();"> Enter </button> <br>
+		<br>
+		<a href=""> Function reference (does nothing for now)</a><br>
+		<br>
+		<canvas id="c" width="800" height="600"></canvas>
+		<br>
+			 <footer>
+	  <p>Made by Otis Laundon. Email me at <a href="mailto:sepee67@gmail.com">sepee67@gmail.com</a> with questions/suggestions!</p>
+	<footer> 
+	</div>
+</body>
+
+<!-- > SHADERS <!-->
+
+<script  id="vertex-shader-2d" type="notjs">
+
+  // an attribute will receive data from a buffer
+  attribute vec4 a_position;
+  uniform mat4 u_dom_mat;
+  uniform mat4 u_ran_mat;
+  uniform float u_scaling_factor;
+
+  varying vec4 color;
+
+  vec4 hsv2rgb_smooth( vec4 c )
+	{
+	    vec3 rgb = clamp( abs(mod(c.x*6.0+vec3(0.0,4.0,2.0),6.0)-3.0)-1.0, 0.0, 1.0);
+		rgb = rgb*rgb*(3.0-2.0*rgb); // cubic smoothing	
+		rgb = c.z * mix( vec3(1.0), rgb, c.y);
+		return vec4(rgb, c.w);
+	}
+
+  vec4 complexToColor(vec2 z)
+  {
+    float zmag = length(z);
+    float heading = atan(z.y, z.x);
+
+    return hsv2rgb_smooth(vec4(heading / (2.0 * 3.1415927) + 0.5, min(1.0, 1.0/zmag), min(1.0, zmag), min(1.0, 1.0/zmag)));
+  }
+
+// complex functions START
+
+float e = 2.71;
+float pi = 3.14159;
+
+vec2 cpow(vec2 z, vec2 alpha, float branch)
+{
+  float zmag = length(z);
+  float heading = atan(z.y, z.x);
+
+  if (zmag == 0.0)
+    return z;
+
+  int k = int((branch - heading) / (2.0 * pi));
+
+  float Arg_phi_z = heading + 2.0 * pi * float(k);
+
+  vec2 w = vec2(log(sqrt(z.x * z.x + z.y * z.y)), Arg_phi_z);
+  w = vec2(w.x * alpha.x - w.y * alpha.y, w.x * alpha.y + w.y * alpha.x);
+
+  return vec2(pow(e, w.x) * cos(w.y), pow(e, w.x) * sin(w.y));
+}
+
+
+vec2 clog(vec2 z, float branch)
+{
+  int k = int((branch - atan(z.y, z.x) + pi) / (2.0 * pi));
+
+  return vec2(log(length(z)), atan(z.y, z.x) + (2.0 * float(k) * pi));
+}
+
+
+vec2 cmult(vec2 a, vec2 b)
+{
+  //returns a * b
+  return vec2(a.x * b.x - a.y * b.y, a.x * b.y + a.y * b.x);
+}
+
+// complex functions END
+
+
+  vec2 complexFunction(vec2 z)
+  {
+  	float p = 0.0;
+
+    //USERDEFINED
+
+	return cpow(vec2(e, 0.0), (clog(z + vec2(0.0, 1.0), pi/2.0) + clog(z + vec2(0.0, -1.0), pi/2.0)) * 0.5, 0.0);
+  }
+
+  // all shaders have a main function
+  void main() {
+
+    // gl_Position is a special variable a vertex shader
+    // is responsible for setting
+
+    vec2 image = complexFunction(a_position.xy);
+
+    float dx = 6.0/200.0;
+    
+    vec2 imagemdx = complexFunction(a_position.xy - vec2(dx,0));
+    vec2 imagemdy = complexFunction(a_position.xy - vec2(0.0,dx));
+    vec2 imagedx = complexFunction(a_position.xy + vec2(dx,0));
+    vec2 imagedy = complexFunction(a_position.xy + vec2(0.0,dx));
+
+    vec4 dom_screen = u_dom_mat * a_position;
+    vec4 ran_screen = u_ran_mat * vec4(image, 0, 1);
+
+    float gradThresh = 8.0;
+
+    bool notTooSteep = length(imagemdx.x - imagedx.x) < gradThresh * 2.0 * dx && length(imagemdy.y - imagedy.y) < gradThresh * 2.0 * dx;
+
+    gl_Position = dom_screen + ran_screen;
+    gl_Position = vec4(gl_Position.rgb * u_scaling_factor, gl_Position.w);
+    color = complexToColor(image.xy);
+	float alpha = float(notTooSteep) * color.a;
+    color = vec4(color.rgb * alpha, alpha);
+  }
+
+</script>
+<script  id="fragment-shader-2d" type="notjs">
+
+  // fragment shaders don't have a default precision so we need
+  // to pick one. mediump is a good default
+  precision mediump float;
+
+  varying vec4 color;
+
+  void main() {
+    // gl_FragColor is a special variable a fragment shader
+    // is responsible for setting
+    gl_FragColor = color; 
+  }
+  </script>
+
+<!-- > RUN APP AFTER EVERYTHING ELSE IS LOADED <!-->
+
+<script src="app.js"></script>
+>>>>>>> Stashed changes
