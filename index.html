@@ -3,15 +3,27 @@
 		Complex Function Plotter
 	</title>
 </head>
-<body style="display: flex; align-items: center;">
+<body style="display: flex; justify-items: center;">
+	<div> 
+		Background Color <input type="color" value="#888888">  </input> <br>
+		<br>
+		<input type="range" min="-6.2831853" max="6.2831853" value="0.0000" step="any" class="slider" id="angle-a"> a <br>
+		<input type="range" min="-6.2831853" max="6.2831853" value="1.5708" step="any" class="slider" id="angle-b"> b <br>
+		<input type="range" min="-6.2831853" max="6.2831853" value="0.0000" step="any" class="slider" id="angle-c"> c <br>
+		<input type="range" min="-6.2831853" max="6.2831853" value="1.5708" step="any" class="slider" id="angle-d"> d <br>
+	    <br>
+		<input type="range" min="0" max="2" value="1" step="any" class="slider" id="domain-scale">  Domain Scale  <br>
+		<input type="range" min="0" max="2" value="1" step="any" class="slider" id="range-scale"> Range Scale <br>
+
+	</div>
 	<div style="align-self: center; max-width: 800; margin: auto;">
-		<h1>Complex Plotter</h1>
+		<h1>Complex Plotter ???</h1>
 		f(z) = <input type="text" name="f(z)" id ="function-input">
     <button type="button" name="submit-function" onclick="reloadFunction();"> Enter </button> <br>
 		<br>
 		<a href=""> Function reference (does nothing for now)</a><br>
 		<br>
-		<canvas id="c" width="800" height="600"></canvas>
+		<canvas id="c" width="800" height="600" onmousedown="OnDragCanvas(event)"></canvas>
 		<br>
 			 <footer>
 	  <p>Made by Otis Laundon. Email me at <a href="mailto:sepee67@gmail.com">sepee67@gmail.com</a> with questions/suggestions!</p>
@@ -21,13 +33,12 @@
 
 <!-- > SHADERS <!-->
 
-<script  id="vertex-shader-2d" type="notjs">
+<script  id="func-eval-vertex-shader" type="notjs">
 
   // an attribute will receive data from a buffer
   attribute vec4 a_position;
   uniform mat4 u_dom_mat;
   uniform mat4 u_ran_mat;
-  uniform float u_scaling_factor;
 
   varying vec4 color;
 
@@ -49,7 +60,7 @@
 
 // complex functions START
 
-float e = 2.71;
+float e = 2.7183;
 float pi = 3.14159;
 
 vec2 cpow(vec2 z, vec2 alpha, float branch)
@@ -120,14 +131,33 @@ vec2 cmult(vec2 a, vec2 b)
     bool notTooSteep = length(imagemdx.x - imagedx.x) < gradThresh * 2.0 * dx && length(imagemdy.y - imagedy.y) < gradThresh * 2.0 * dx;
 
     gl_Position = dom_screen + ran_screen;
-    gl_Position = vec4(gl_Position.rgb * u_scaling_factor, gl_Position.w);
+    gl_Position = vec4(gl_Position.rgb, gl_Position.w);
     color = complexToColor(image.xy);
 	float alpha = float(notTooSteep) * color.a;
     color = vec4(color.rgb * alpha, alpha);
   }
 
 </script>
-<script  id="fragment-shader-2d" type="notjs">
+
+<script  id="direct-vertex-shader" type="notjs">
+
+  // an attribute will receive data from a buffer
+  attribute vec4 a_position;
+  uniform mat4 u_dom_mat;
+  uniform mat4 u_ran_mat;
+
+  varying vec4 color;
+
+  // all shaders have a main function
+  void main() 
+  {
+    gl_Position = a_position;
+    color = vec4(1.0, 1.0, 1.0, 1.0);
+  }
+
+</script>
+
+<script  id="fragment-shader" type="notjs">
 
   // fragment shaders don't have a default precision so we need
   // to pick one. mediump is a good default
