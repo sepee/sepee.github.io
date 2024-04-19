@@ -139,6 +139,8 @@ function createShaderPrograms(gl)
 	// Link the two shaders into a program
 	programFuncEval = createProgram(gl, func_eval_vs, fs);
 	programDirect = createProgram(gl , direct_vs, fs);
+	
+	return (programFuncEval != null);
 }
 
 function createProgram(gl, vertexShader, fragmentShader) {
@@ -160,7 +162,7 @@ var rangeToScreenMatrix
 
 var t = 0;
 var gridSize = 101;
-var domSize = 5;
+var domSize = 4;
 var scalingFactor = 1/domSize;
 
 // Generate Grid Mesh
@@ -189,7 +191,11 @@ for (let xGrid = 0; xGrid < gridSize + 1; xGrid++) {
 	}
 }
 
+var mainRunning = false;
+
 function main() {
+	
+	mainRunning = true;
 	
 	var canvas = document.querySelector("#c");
 	var gl = InitializeWebGLEnvironment(canvas);
@@ -200,7 +206,7 @@ function main() {
 	gl.enable(gl.BLEND);
 	gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
-	createShaderPrograms(gl);
+	var programs_compiled_success = createShaderPrograms(gl);
 	
 	var gridPositionBuffer = gl.createBuffer();	// Create a buffer and put three 2d clip space points in it
 	gl.bindBuffer(gl.ARRAY_BUFFER, gridPositionBuffer);	// Bind it to ARRAY_BUFFER (think of it as ARRAY_BUFFER = positionBuffer)
@@ -225,6 +231,7 @@ function drawFrame()
 	var domain_scale = document.getElementById("domain-scale").value * scalingFactor;
 	var range_scale = document.getElementById("range-scale").value * scalingFactor;
 	var draw_bases = document.getElementById("draw-bases").checked;
+	var lipschitz_const = document.getElementById("lipschitz-const").value;
 	
 	console.log(p);
 	
@@ -267,11 +274,13 @@ function drawFrame()
 		var rangeMatLoc = gl.getUniformLocation(program, "u_ran_mat");
 		var pLoc = gl.getUniformLocation(program, "t");
 		var branchLoc = gl.getUniformLocation(program, "branch");
+		var lipschitzLoc = gl.getUniformLocation(program, "u_lipschitz");
 
 		gl.uniformMatrix4fv(domainMatLoc, false, domainToScreenMatrix);
 		gl.uniformMatrix4fv(rangeMatLoc, false, rangeToScreenMatrix);
 		gl.uniform1f(pLoc, p);
 		gl.uniform1f(branchLoc, branch);
+		gl.uniform1f(lipschitzLoc, lipschitz_const);
 
 		// draw
 		gl.drawArrays(gl.LINES, 0, bufferLength/2);
@@ -294,6 +303,8 @@ function drawFrame()
 		main();
 	}
 	}
+	
+	mainRunning = false;
 }
 
 var animate = true;
@@ -301,11 +312,8 @@ var animate = true;
 function reloadFunction()
 {
 animate = false;
-}
-
-function DrawMeshWithShader()
-{
-	
+if(!mainRunning)
+	main();
 }
 
 main();
