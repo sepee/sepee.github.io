@@ -224,6 +224,9 @@ function drawFrame()
 	
 	var domain_scale = document.getElementById("domain-scale").value * scalingFactor;
 	var range_scale = document.getElementById("range-scale").value * scalingFactor;
+	var draw_bases = document.getElementById("draw-bases").checked;
+	
+	console.log(draw_bases);
 	
 	domainToScreenMatrix = [
 		Math.cos(angle_a) * domain_scale, Math.sin(angle_a) * aspectRatio * domain_scale, 0, 0,
@@ -280,7 +283,8 @@ function drawFrame()
 		drawPositionsWithProgram(gridPositionBuffer, gridMesh.length, programFuncEval, parseFloat(branches[i]));
 	}
 
-	drawPositionsWithProgram(axesPositionBuffer, axesMesh.length, programDirect);
+	if(draw_bases)
+		drawPositionsWithProgram(axesPositionBuffer, axesMesh.length, programDirect);
 	
 	if(animate)
 	{

@@ -14,8 +14,10 @@
 		<input type="range" min="0.0" max="6.2831853" value="0.0000" step="any" class="slider" id="angle-c"> c <br>
 		<input type="range" min="0.0" max="6.2831853" value="1.5708" step="any" class="slider" id="angle-d"> d <br>
 	    <br>
-		<input type="range" min="0" max="2" value="1" step="any" class="slider" id="domain-scale">  Domain Scale  <br>
-		<input type="range" min="0" max="2" value="1" step="any" class="slider" id="range-scale"> Range Scale <br>
+		<input type="range" min="0" max="2" value="1" step="any" id="domain-scale">  Domain Scale  <br>
+		<input type="range" min="0" max="2" value="1" step="any" id="range-scale"> Range Scale <br>
+		<input type="checkbox" step="any" checked="true" id="draw-bases"> Draw Bases <br>
+
 		<h3>Function</h3>
 		<input type="text" value="0, 1" step="any" class="slider" id="branches"> branches <br>
 		<input type="range" min="0.0" max="1.0" value="0.0" step="any" class="slider" id="slider-p"> p <br>
@@ -30,9 +32,6 @@
 		<br>
 		<canvas id="c" width="800" height="540" onmousedown="OnDragCanvas(event)"></canvas>
 		<br>
-	 <footer>
-	  <p>Made by Otis Laundon. Email me at <a href="mailto:sepee67@gmail.com">sepee67@gmail.com</a> with questions/suggestions!</p>
-	<footer> 
 	</div>
 	
 	<div>
@@ -62,6 +61,27 @@
 		Hold `Ctrl` whilst dragging to rotate the "range plane".
 	</div>
 </div>
+
+<h2>How to Interpret the Graph</h2>
+
+In order to see how this interpret the 4D graphs drawn by plotter, we can relate them to the simpler case of 2d graphs of real valued functions.
+<br>
+<br>
+In the graph of a real function <i> f: R -> R</i> there are <i>2</i> axes, corresponding to the domain and range of <i>f</i>. 
+In order to plot a point on the graph of the real function we can move from the origin <i>x</i> units to the right (along the "domain axis"), 
+and then from there move <i>f(x)</i> units upwards (along the "range axis"). 
+<br>
+<br>
+The 4D graph plotter functions in much the same way, whereas instead of having domain and range axes, for a complex function
+<i>g(z): C -> C</i> we have a plane for each <i>z</i> and <i>g(z)</i>, which we will call the "domain plane" and "range plane". 
+The "domain plane" has basis <i>{(cos(a), sin(a))<sup>T</sup>, (cos(b), sin(b))<sup>T</sup>}</i> and the range plane has basis  <i>{(cos(c), sin(c))<sup>T</sup>, (cos(d), sin(d))<sup>T</sup>}</i>.
+In order to plot a point on the graph of we can move from the origin to the point <i>z</i> in our "domain plane", 
+and from there move to the point <i>g(z)</i> in our "range plane". This process is repeated for all the points in a subset of our domain.
+
+<footer>
+	  <p>Made by Otis Laundon. Email me at <a href="mailto:sepee67@gmail.com">sepee67@gmail.com</a> with questions/suggestions!</p>
+	<footer> 
+	
 </body>
 
 <!-- > SHADERS <!-->
