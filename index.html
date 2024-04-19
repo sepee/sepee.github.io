@@ -3,9 +3,12 @@
 		Complex Function Plotter
 	</title>
 </head>
-<body style="display: flex; justify-items: center;">
+<body >
+<h1> Complex Plotter</h1>
+<div style="display: flex; justify-items: center;">
 	<div> 
-		<h3> Plot Parameters</h3>
+		<h2>Parameters</h2>
+		<h3> Graph</h3>
 		<input type="range" min="0.0" max="6.2831853" value="0.0000" step="any" class="slider" id="angle-a"> a <br>
 		<input type="range" min="0.0" max="6.2831853" value="1.5708" step="any" class="slider" id="angle-b"> b <br>
 		<input type="range" min="0.0" max="6.2831853" value="0.0000" step="any" class="slider" id="angle-c"> c <br>
@@ -13,12 +16,12 @@
 	    <br>
 		<input type="range" min="0" max="2" value="1" step="any" class="slider" id="domain-scale">  Domain Scale  <br>
 		<input type="range" min="0" max="2" value="1" step="any" class="slider" id="range-scale"> Range Scale <br>
-		<h3>Function Parameters</h3>
+		<h3>Function</h3>
 		<input type="text" value="0, 1" step="any" class="slider" id="branches"> branches <br>
 		<input type="range" min="0.0" max="1.0" value="0.0" step="any" class="slider" id="slider-p"> p <br>
 	</div>
 	<div style="align-self: center; max-width: 800; margin: auto;">
-		<h1>Complex Plotter</h1>
+		<h2>Graph</h2>
 		<div style="display:flex; flex-wrap: wrap; max-height:50px">
 			<p> f(z) = </p>
 			<input type="text" style="flex-grow: 1" name="f(z)" value = "cpow(cmult(z, z) + vec2(1.0, 0.0), 0.5, branch * 2.0 * pi)" id ="function-input" onenter="reloadFunction();">
@@ -27,10 +30,36 @@
 		<br>
 		<canvas id="c" width="800" height="540" onmousedown="OnDragCanvas(event)"></canvas>
 		<br>
-			 <footer>
+	 <footer>
 	  <p>Made by Otis Laundon. Email me at <a href="mailto:sepee67@gmail.com">sepee67@gmail.com</a> with questions/suggestions!</p>
 	<footer> 
 	</div>
+	
+	<div>
+	<h2>Instructions</h2>
+	<h3> Inputing Functions</h3>
+		<li> To input the complex number <i>x + iy</i> write <code>vec2(x, y)</code> <br>
+		<li> All real numbers must be written with decimal points <br>
+		  e.g. <i> 2.0 </i>, not <i> 2 </i> <br>
+    <h3> Function Reference</h3>
+	For all complex numbers <i> z,w </i>: <br>
+	<br>
+		<li> <code> z + w </code> returns <i> z + w </i> <br>
+		<li> <code> cmult(z, w) </code> returns <i> zw </i> <br>
+		<li> <code> clog(z, phi) </code> returns <i> Log<sub>phi</sub>(z) </i> <br>
+		<li> <code> cexp(z) </code> returns <i> e<sup>z</sub> </i> <br>
+		<li> <code> cpow(z, w, phi) </code> returns <i> exp(w Log<sub>phi</sub>(z)) </i> <br>
+
+	<h3> Function Parameters </h3>
+		Change the list of `branches` on the left-panel. <br>
+		The function will be rendered once for each branch. <br>
+		Use parameter `branch` in your function definition <br>
+		to define different branches of your function. <br>
+	<h3> Interaction</h3>
+		Click and drag on the graph to rotate the "domain plane". <br>
+		Hold `Ctrl` whilst dragging to rotate the "range plane".
+	</div>
+</div>
 </body>
 
 <!-- > SHADERS <!-->
@@ -77,7 +106,7 @@ vec2 cpow(vec2 z, vec2 alpha, float branch)
   if (zmag == 0.0)
     return z;
 
-  int k = int((branch - heading + pi) / (2.0 * pi));
+  int k = int((branch - heading + 2.0 *  pi) / (2.0 * pi));
 
   float Arg_phi_z = heading + 2.0 * pi * float(k);
 
