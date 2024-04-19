@@ -1,3 +1,25 @@
+// TODO:
+/*
+ - color axes.
+ - label axes.
+ - make function inputing more intuitive
+ - add example functions
+	- add explaination text per function
+ - add overall explaination section
+ - make background color work
+ - mess with blend modes some more
+ - add better mobile support
+*/
+
+const is_key_down = (() => {
+    const state = {};
+
+    window.addEventListener('keyup', (e) => state[e.key] = false);
+    window.addEventListener('keydown', (e) => state[e.key] = true);
+
+    return (key) => state.hasOwnProperty(key) && state[key] || false;
+})();
+
 
 var xpos  = 0;
 var ypos = 0;
@@ -15,26 +37,37 @@ var sensitivity = 0.01;
 // dragging controls
 OnDragCanvas = function(event) {
 
-
-	xpos = event.pageX;
-	ypos = event.pageY;
+xpos = event.pageX;
+ypos = event.pageY;
 	
   // centers the ball at (pageX, pageY) coordinates
-  function moveAt(pageX, pageY) {
-	  xdelta = pageX - xpos;
-	  ydelta = pageY - ypos;
-    xpos = pageX;
-    ypos = pageY;
+function moveAt(event) {
 	
-	angle_a += sensitivity * xdelta;
-	angle_b += sensitivity * ydelta;
+	var pageX = event.pageX;
+	var pageY = event.pageY;
+	
+	xdelta = pageX - xpos;
+	ydelta = pageY - ypos;
+	xpos = pageX;
+	ypos = pageY;
+	
+	if(is_key_down("Alt"))
+	{
+	angle_a -= sensitivity * xdelta;
+	angle_b -= sensitivity * ydelta;
+	document.getElementById("angle-a").value = (angle_a + 6.2831853) % 6.2831853;
+	document.getElementById("angle-b").value = (angle_b + 6.2831853) % 6.2831853;
+	}else
+	{
+	angle_c -= sensitivity * xdelta;
+	angle_d -= sensitivity * ydelta;
+	document.getElementById("angle-c").value = (angle_c + 6.2831853) % 6.2831853;
+	document.getElementById("angle-d").value = (angle_d + 6.2831853) % 6.2831853;
+	}
   }
 
-  // move our absolutely positioned ball under the pointer
-  moveAt(event.pageX, event.pageY);
-
   function onMouseMove(event) {
-    moveAt(event.pageX, event.pageY);
+    moveAt(event);
   }
 
   // (2) move the ball on mousemove
@@ -47,8 +80,6 @@ OnDragCanvas = function(event) {
   };
 
 };
-
-
 
 
 var aspectRatio;
@@ -167,7 +198,7 @@ function main() {
 	gl.clearColor(0.5, 0.5, 0.5, 1.0);
 
 	gl.enable(gl.BLEND);
-	gl.blendFunc(gl.ONE, gl.ONE_MINUS_SRC_ALPHA);
+	gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
 	createShaderPrograms(gl);
 	
@@ -183,24 +214,28 @@ function drawFrame()
 
 	t += 0.01;
 	
-	//angle_a = document.getElementById("angle-a").value;
-	//angle_b = document.getElementById("angle-b").value;
+	angle_a = document.getElementById("angle-a").value;
+	angle_b = document.getElementById("angle-b").value;
 	angle_c = document.getElementById("angle-c").value;
 	angle_d = document.getElementById("angle-d").value;
+	
+	var p = document.getElementById("slider-p").value;
+	var branches = document.getElementById("branches").value.split(",");
+	console.log(branches);
 	
 	var domain_scale = document.getElementById("domain-scale").value * scalingFactor;
 	var range_scale = document.getElementById("range-scale").value * scalingFactor;
 	
 	domainToScreenMatrix = [
-		Math.cos(angle_a) * domain_scale, Math.cos(angle_b) * aspectRatio * domain_scale, 0, 0,
-		Math.sin(angle_a) * domain_scale, Math.sin(angle_b) * aspectRatio * domain_scale, 0, 0,
+		Math.cos(angle_a) * domain_scale, Math.sin(angle_a) * aspectRatio * domain_scale, 0, 0,
+		Math.cos(angle_b) * domain_scale, Math.sin(angle_b) * aspectRatio * domain_scale, 0, 0,
 		0, 0, 1, 0,
 		0, 0, 0, 1
 	];
 
 	rangeToScreenMatrix = [
-		Math.cos(angle_c) * range_scale, Math.cos(angle_d) * aspectRatio * range_scale, 0, 0,
-		Math.sin(angle_c) * range_scale, Math.sin(angle_d) * aspectRatio * range_scale, 0, 0,
+		Math.cos(angle_c) * range_scale, Math.sin(angle_c) * aspectRatio * range_scale, 0, 0,
+		Math.cos(angle_d) * range_scale, Math.sin(angle_d) * aspectRatio * range_scale, 0, 0,
 		0, 0, 1, 0,
 		0, 0, 0, 1
 	];
@@ -214,7 +249,7 @@ function drawFrame()
 	gl.bindBuffer(gl.ARRAY_BUFFER, axesPositionBuffer);	// Bind it to ARRAY_BUFFER (think of it as ARRAY_BUFFER = positionBuffer)
 	gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(axesMesh), gl.DYNAMIC_DRAW);
 	
-	function drawPositionsWithProgram(positionBuffer, bufferLength, program)
+	function drawPositionsWithProgram(positionBuffer, bufferLength, program, branch = 0.0)
 	{		
 		// Bind the position buffer.
 		gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
@@ -228,16 +263,24 @@ function drawFrame()
 
 		var domainMatLoc = gl.getUniformLocation(program, "u_dom_mat");
 		var rangeMatLoc = gl.getUniformLocation(program, "u_ran_mat");
+		var pLoc = gl.getUniformLocation(program, "p");
+		var branchLoc = gl.getUniformLocation(program, "branch");
 
 		gl.uniformMatrix4fv(domainMatLoc, false, domainToScreenMatrix);
 		gl.uniformMatrix4fv(rangeMatLoc, false, rangeToScreenMatrix);
-
+		gl.uniform1f(pLoc, p);
+		gl.uniform1f(branchLoc, branch);
 
 		// draw
 		gl.drawArrays(gl.LINES, 0, bufferLength/2);
 	}
 	
-	drawPositionsWithProgram(gridPositionBuffer, gridMesh.length, programFuncEval);
+	// draw each specified branch of the function
+	for(let i = 0; i < branches.length; i++)
+	{
+		drawPositionsWithProgram(gridPositionBuffer, gridMesh.length, programFuncEval, parseFloat(branches[i]));
+	}
+
 	drawPositionsWithProgram(axesPositionBuffer, axesMesh.length, programDirect);
 	
 	if(animate)

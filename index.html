@@ -5,25 +5,26 @@
 </head>
 <body style="display: flex; justify-items: center;">
 	<div> 
-		Background Color <input type="color" value="#888888">  </input> <br>
-		<br>
-		<input type="range" min="-6.2831853" max="6.2831853" value="0.0000" step="any" class="slider" id="angle-a"> a <br>
-		<input type="range" min="-6.2831853" max="6.2831853" value="1.5708" step="any" class="slider" id="angle-b"> b <br>
-		<input type="range" min="-6.2831853" max="6.2831853" value="0.0000" step="any" class="slider" id="angle-c"> c <br>
-		<input type="range" min="-6.2831853" max="6.2831853" value="1.5708" step="any" class="slider" id="angle-d"> d <br>
+		<h3> Plot Parameters</h3>
+		<input type="range" min="0.0" max="6.2831853" value="0.0000" step="any" class="slider" id="angle-a"> a <br>
+		<input type="range" min="0.0" max="6.2831853" value="1.5708" step="any" class="slider" id="angle-b"> b <br>
+		<input type="range" min="0.0" max="6.2831853" value="0.0000" step="any" class="slider" id="angle-c"> c <br>
+		<input type="range" min="0.0" max="6.2831853" value="1.5708" step="any" class="slider" id="angle-d"> d <br>
 	    <br>
 		<input type="range" min="0" max="2" value="1" step="any" class="slider" id="domain-scale">  Domain Scale  <br>
 		<input type="range" min="0" max="2" value="1" step="any" class="slider" id="range-scale"> Range Scale <br>
+		<h3>Function Parameters</h3>
+		<input type="text" value="0.0, 1.0" step="any" class="slider" id="branches"> branches <br>
+		<input type="range" min="0.0" max="1.0" value="0.0" step="any" class="slider" id="slider-p"> p <br>
+
 
 	</div>
 	<div style="align-self: center; max-width: 800; margin: auto;">
-		<h1>Complex Plotter ???</h1>
-		f(z) = <input type="text" name="f(z)" id ="function-input">
+		<h1>Complex Plotter</h1>
+		f(z) = <input type="text" name="f(z)" value = "cpow(cmult(z, z) + vec2(1.0, 0.0), vec2(0.5, 0.0), branch * 2.0 * pi)" id ="function-input">
     <button type="button" name="submit-function" onclick="reloadFunction();"> Enter </button> <br>
 		<br>
-		<a href=""> Function reference (does nothing for now)</a><br>
-		<br>
-		<canvas id="c" width="800" height="600" onmousedown="OnDragCanvas(event)"></canvas>
+		<canvas id="c" width="800" height="540" onmousedown="OnDragCanvas(event)"></canvas>
 		<br>
 			 <footer>
 	  <p>Made by Otis Laundon. Email me at <a href="mailto:sepee67@gmail.com">sepee67@gmail.com</a> with questions/suggestions!</p>
@@ -33,12 +34,15 @@
 
 <!-- > SHADERS <!-->
 
-<script  id="func-eval-vertex-shader" type="notjs">
+<script id="func-eval-vertex-shader" type="notjs">
 
   // an attribute will receive data from a buffer
   attribute vec4 a_position;
   uniform mat4 u_dom_mat;
   uniform mat4 u_ran_mat;
+  
+  uniform float p;
+  uniform float branch;
 
   varying vec4 color;
 
@@ -71,7 +75,7 @@ vec2 cpow(vec2 z, vec2 alpha, float branch)
   if (zmag == 0.0)
     return z;
 
-  int k = int((branch - heading) / (2.0 * pi));
+  int k = int((branch - heading + pi) / (2.0 * pi));
 
   float Arg_phi_z = heading + 2.0 * pi * float(k);
 
@@ -104,8 +108,8 @@ vec2 cmult(vec2 a, vec2 b)
   	float p = 0.0;
 
     //USERDEFINED
-
-	return cpow(vec2(e, 0.0), (clog(z + vec2(0.0, 1.0), pi/2.0) + clog(z + vec2(0.0, -1.0), pi/2.0)) * 0.5, 0.0);
+	// good example from homework: cpow(vec2(e, 0.0), (clog(z + vec2(0.0, 1.0), pi/2.0) + clog(z + vec2(0.0, -1.0), pi/2.0)) * 0.5, 0.0)
+	return vec2(0);
   }
 
   // all shaders have a main function
@@ -116,7 +120,7 @@ vec2 cmult(vec2 a, vec2 b)
 
     vec2 image = complexFunction(a_position.xy);
 
-    float dx = 6.0/200.0;
+    float dx = 0.05;
     
     vec2 imagemdx = complexFunction(a_position.xy - vec2(dx,0));
     vec2 imagemdy = complexFunction(a_position.xy - vec2(0.0,dx));
@@ -128,11 +132,12 @@ vec2 cmult(vec2 a, vec2 b)
 
     float gradThresh = 8.0;
 
-    bool notTooSteep = length(imagemdx.x - imagedx.x) < gradThresh * 2.0 * dx && length(imagemdy.y - imagedy.y) < gradThresh * 2.0 * dx;
+    bool notTooSteep = length(imagemdx - imagedx) < gradThresh * 2.0 * dx && length(imagemdy - imagedy) < gradThresh * 2.0 * dx;
 
     gl_Position = dom_screen + ran_screen;
     gl_Position = vec4(gl_Position.rgb, gl_Position.w);
     color = complexToColor(image.xy);
+	
 	float alpha = float(notTooSteep) * color.a;
     color = vec4(color.rgb * alpha, alpha);
   }
