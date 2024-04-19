@@ -226,7 +226,7 @@ function drawFrame()
 	var range_scale = document.getElementById("range-scale").value * scalingFactor;
 	var draw_bases = document.getElementById("draw-bases").checked;
 	
-	console.log(draw_bases);
+	console.log(p);
 	
 	domainToScreenMatrix = [
 		Math.cos(angle_a) * domain_scale, Math.sin(angle_a) * aspectRatio * domain_scale, 0, 0,
@@ -265,7 +265,7 @@ function drawFrame()
 
 		var domainMatLoc = gl.getUniformLocation(program, "u_dom_mat");
 		var rangeMatLoc = gl.getUniformLocation(program, "u_ran_mat");
-		var pLoc = gl.getUniformLocation(program, "p");
+		var pLoc = gl.getUniformLocation(program, "t");
 		var branchLoc = gl.getUniformLocation(program, "branch");
 
 		gl.uniformMatrix4fv(domainMatLoc, false, domainToScreenMatrix);

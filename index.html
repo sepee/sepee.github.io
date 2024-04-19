@@ -20,7 +20,7 @@
 
 		<h3>Function</h3>
 		<input type="text" value="0, 1" step="any" class="slider" id="branches"> branches <br>
-		<input type="range" min="0.0" max="1.0" value="0.0" step="any" class="slider" id="slider-p"> p <br>
+		<input type="range" min="0.0" max="1.0" value="0.0" step="any" class="slider" id="slider-p"> t <br>
 	</div>
 	<div style="align-self: center; max-width: 800; margin: auto;">
 		<h2>Graph</h2>
@@ -52,10 +52,13 @@
 		<li> <code> cpow(z, w, phi) </code> returns <i> exp(w Log<sub>phi</sub>(z)) </i> <br>
 
 	<h3> Function Parameters </h3>
-		Change the list of `branches` on the left-panel. <br>
+		<li> Change the list of `branches` on the left-panel. <br>
 		The function will be rendered once for each branch. <br>
 		Use parameter `branch` in your function definition <br>
 		to define different branches of your function. <br>
+		<li> Use parameter <code>t</code> in function definition <br>
+		to allow for easy editing of some function property
+			
 	<h3> Interaction</h3>
 		Click and drag on the graph to rotate the "domain plane". <br>
 		Hold `Ctrl` whilst dragging to rotate the "range plane".
@@ -93,7 +96,7 @@ and from there move to the point <i>g(z)</i> in our "range plane". This process 
   uniform mat4 u_dom_mat;
   uniform mat4 u_ran_mat;
   
-  uniform float p;
+  uniform float t;
   uniform float branch;
 
   varying vec4 color;
