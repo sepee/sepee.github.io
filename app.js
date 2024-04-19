@@ -51,7 +51,7 @@ function moveAt(event) {
 	xpos = pageX;
 	ypos = pageY;
 	
-	if(is_key_down("Alt"))
+	if(is_key_down("Control"))
 	{
 	angle_a -= sensitivity * xdelta;
 	angle_b -= sensitivity * ydelta;
@@ -195,7 +195,7 @@ function main() {
 	var gl = InitializeWebGLEnvironment(canvas);
 		
 	// Set background colour
-	gl.clearColor(0.5, 0.5, 0.5, 1.0);
+	gl.clearColor(0.1, 0.1, 0.1, 1.0);
 
 	gl.enable(gl.BLEND);
 	gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
@@ -221,7 +221,6 @@ function drawFrame()
 	
 	var p = document.getElementById("slider-p").value;
 	var branches = document.getElementById("branches").value.split(",");
-	console.log(branches);
 	
 	var domain_scale = document.getElementById("domain-scale").value * scalingFactor;
 	var range_scale = document.getElementById("range-scale").value * scalingFactor;
