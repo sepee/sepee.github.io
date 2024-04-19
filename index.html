@@ -5,7 +5,7 @@
 </head>
 <body >
 <h1> Complex Plotter</h1>
-<div style="display: flex; justify-items: center;">
+<div style="display: flex;">
 	<div> 
 		<h2>Parameters</h2>
 		<h3> Graph</h3>
@@ -45,13 +45,21 @@
 		<li> All real numbers must be written with decimal points <br>
 		  e.g. <i> 2.0 </i>, not <i> 2 </i> <br>
     <h3> Function Reference</h3>
+		<li> <code> i, pi </code> and  <code> e </code> can be used as constants <br>
+	<br>
 	For all complex numbers <i> z,w </i> and real number <i>phi</i>: <br>
 	<br>
+		<li> <code> ccosh(z) </code> returns <i> cosh(z) </i> <br>
 		<li> <code> z + w </code> returns <i> z + w </i> <br>
 		<li> <code> cmult(z, w) </code> returns <i> zw </i> <br>
 		<li> <code> clog(z, phi) </code> returns <i> Log<sub>phi</sub>(z) </i> <br>
 		<li> <code> cexp(z) </code> returns <i> e<sup>z</sub> </i> <br>
+		<li> <code> cpow(z, w) </code> returns <i> exp(w Log<sub>-pi</sub>(z)) </i> <br>
 		<li> <code> cpow(z, w, phi) </code> returns <i> exp(w Log<sub>phi</sub>(z)) </i> <br>
+		<li> <code> csinh(z) </code> returns <i> sinh(z) </i> <br>
+		<li> <code> ccosh(z) </code> returns <i> cosh(z) </i> <br>
+		<li> <code> csin(z) </code> returns <i> sin(z) </i> <br>
+		<li> <code> ccos(z) </code> returns <i> cos(z) </i> <br>
 
 	<h3> Function Parameters </h3>
 		<li> Change the list of `branches` on the left-panel. <br>
